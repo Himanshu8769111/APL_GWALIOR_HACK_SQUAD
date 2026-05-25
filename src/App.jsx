@@ -175,6 +175,7 @@ export default function App() {
               playbackSpeed={playbackSpeed}
               setPlaybackSpeed={setPlaybackSpeed}
               isScanning={isScanning}
+              uploadedFileRef={uploadedFileRef}
             />
           </div>
 

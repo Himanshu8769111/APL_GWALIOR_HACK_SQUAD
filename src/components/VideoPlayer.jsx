@@ -13,7 +13,8 @@ export default function VideoPlayer({
   setUploadedVideo,
   playbackSpeed,
   setPlaybackSpeed,
-  isScanning
+  isScanning,
+  uploadedFileRef
 }) {
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
@@ -26,6 +27,7 @@ export default function VideoPlayer({
     const file = e.target.files[0];
     if (file) {
       const url = URL.createObjectURL(file);
+      uploadedFileRef.current = file;
       setUploadedVideo(url);
       setIsPlaying(false);
       setCurrentFrame(0);
@@ -479,7 +481,13 @@ export default function VideoPlayer({
         </label>
         
         {uploadedVideo && (
-          <button className="neon-btn neon-btn-red" onClick={() => setUploadedVideo(null)}>
+          <button
+            className="neon-btn neon-btn-red"
+            onClick={() => {
+              setUploadedVideo(null);
+              uploadedFileRef.current = null;
+            }}
+          >
             <span>CLEAR UPLOAD</span>
           </button>
         )}

@@ -3,12 +3,25 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase =
+  supabaseUrl && supabaseKey
+    ? createClient(supabaseUrl, supabaseKey)
+    : null;
+
+const ensureSupabaseConfigured = () => {
+  if (!supabase) {
+    throw new Error(
+      'Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your environment.'
+    );
+  }
+};
 
 /**
  * Upload a video file to Supabase Storage and return its public URL.
  */
 export async function uploadVideoClip(file) {
+  ensureSupabaseConfigured();
+
   const timestamp = Date.now();
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   const filePath = `clips/${timestamp}_${safeName}`;
@@ -52,6 +65,8 @@ export async function saveDrsReview({
   videoFilename,
   sourceMode,
 }) {
+  ensureSupabaseConfigured();
+
   const { data, error } = await supabase
     .from('drs_reviews')
     .insert([
@@ -83,6 +98,10 @@ export async function saveDrsReview({
  * Fetch all past DRS reviews, most recent first.
  */
 export async function fetchDrsReviews() {
+  if (!supabase) {
+    return [];
+  }
+
   const { data, error } = await supabase
     .from('drs_reviews')
     .select('*')
